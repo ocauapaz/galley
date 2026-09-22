@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+      - run: npm test
+      - run: npx tauri build --no-bundle
+
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist-release | Out-Null
+          Copy-Item src-tauri/target/release/galley.exe dist-release/Galley.exe
+          Copy-Item README.md dist-release/README.md
+          Compress-Archive -Force -Path dist-release/Galley.exe, dist-release/README.md -DestinationPath "dist-release/Galley-${{ github.ref_name }}-windows-x64.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Galley-windows-x64
+          path: dist-release/
+
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            dist-release/Galley.exe
+            dist-release/Galley-*.zip

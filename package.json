@@ -1,0 +1,35 @@
+{
+  "name": "galley",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "tauri": "tauri",
+    "test": "node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.5",
+    "vite": "^8.3.0"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.20.3",
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/legacy-modes": "^6.5.4",
+    "@codemirror/search": "^6.7.2",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.13",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/instrument-sans": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource/fira-code": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@lezer/highlight": "^1.2.3",
+    "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/plugin-dialog": "^2.7.3",
+    "codemirror": "^6.0.2",
+    "pdfjs-dist": "^6.3.289"
+  }
+}

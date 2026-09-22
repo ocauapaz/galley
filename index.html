@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" data-theme="ink">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galley</title>
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#editor-host">Skip to editor</a>
+  <div id="app">
+    <header class="titlebar" data-tauri-drag-region>
+      <div class="brand" data-tauri-drag-region aria-hidden="true"><svg class="brand-mark" viewBox="300 130 600 760" aria-hidden="true"><g transform="rotate(-8 512 520)"><rect x="318" y="150" width="400" height="720" rx="30" fill="#f3ecdf"/><rect x="378" y="228" width="200" height="44" rx="22" fill="#26221d"/><rect x="378" y="610" width="280" height="30" rx="15" fill="#c7bca9"/><rect x="378" y="690" width="200" height="30" rx="15" fill="#c7bca9"/><path d="M 360 461 C 470 452 580 452 676 448 C 770 444 820 392 786 352 C 752 314 694 348 724 392 C 750 430 812 440 862 424" fill="none" stroke="var(--accent)" stroke-width="56" stroke-linecap="round"/></g></svg><span>Galley</span></div>
+      <nav class="menubar" aria-label="Main menu">
+        <button class="menu-btn" data-menu="file" aria-haspopup="menu">File</button>
+        <button class="menu-btn" data-menu="view" aria-haspopup="menu">View</button>
+        <button class="menu-btn" data-menu="build" aria-haspopup="menu">Build</button>
+        <button class="menu-btn" data-menu="help" aria-haspopup="menu">Help</button>
+      </nav>
+      <button class="title-search" id="title-search" aria-label="Search files and commands (Ctrl+P)">
+        <span class="ts-icon"></span><span id="doc-title" data-tauri-drag-region>Galley</span><kbd>Ctrl P</kbd>
+      </button>
+      <div class="title-actions">
+        <button class="compile-btn" id="compile-btn" title="Compile (Ctrl+Enter)" aria-label="Compile">
+          <span class="cb-icon"></span><span class="cb-label">Compile</span>
+        </button>
+        <button class="icon-btn" id="toggle-pdf" aria-label="Toggle PDF preview (Ctrl+Alt+P)" title="Toggle PDF preview (Ctrl+Alt+P)"></button>
+        <button class="icon-btn" id="open-settings" aria-label="Settings (Ctrl+,)" title="Settings (Ctrl+,)"></button>
+      </div>
+      <div class="window-controls">
+        <button class="wc" id="wc-min" aria-label="Minimize" tabindex="-1"></button>
+        <button class="wc" id="wc-max" aria-label="Maximize" tabindex="-1"></button>
+        <button class="wc wc-close" id="wc-close" aria-label="Close" tabindex="-1"></button>
+      </div>
+    </header>
+
+    <div class="body">
+      <nav class="activitybar" role="tablist" aria-orientation="vertical" aria-label="Side panels">
+        <button class="act" role="tab" data-view="files" aria-label="Files" title="Files"></button>
+        <button class="act" role="tab" data-view="outline" aria-label="Outline" title="Outline"></button>
+        <button class="act" role="tab" data-view="snippets" aria-label="Snippets" title="Snippets"></button>
+        <button class="act" role="tab" data-view="symbols" aria-label="Symbols" title="Math symbols"></button>
+        <div class="act-spacer"></div>
+        <button class="act" id="act-settings" aria-label="Settings" title="Settings"></button>
+      </nav>
+
+      <aside class="sidebar" id="sidebar" role="tabpanel" aria-label="Side panel">
+        <section class="side-view" data-view="files">
+          <header class="side-head">
+            <h2 class="side-title">Explorer</h2>
+            <div class="side-tools" id="files-tools"></div>
+          </header>
+          <div class="folder-name" id="folder-name" hidden></div>
+          <div class="side-scroll" id="explorer" tabindex="-1"></div>
+          <div class="side-empty" id="files-empty"></div>
+        </section>
+        <section class="side-view" data-view="outline">
+          <header class="side-head"><h2 class="side-title">Outline</h2></header>
+          <div class="side-scroll" id="outline"></div>
+        </section>
+        <section class="side-view" data-view="snippets">
+          <header class="side-head"><h2 class="side-title">Snippets</h2><div class="side-tools" id="snip-tools"></div></header>
+          <div class="side-filter"><input class="input" id="snip-filter" type="search" placeholder="Filter snippets" aria-label="Filter snippets" /></div>
+          <div class="side-scroll" id="snippets"></div>
+        </section>
+        <section class="side-view" data-view="symbols">
+          <header class="side-head"><h2 class="side-title">Symbols</h2></header>
+          <div class="side-filter"><input class="input" id="sym-filter" type="search" placeholder="Filter symbols" aria-label="Filter symbols" /></div>
+          <div class="side-scroll" id="symbols"></div>
+        </section>
+      </aside>
+      <div class="sash sash-v" id="sash-sidebar" role="separator" aria-orientation="vertical" aria-label="Resize sidebar" tabindex="0"></div>
+
+      <main class="workbench">
+        <div class="editor-col">
+          <div class="tabs" id="tabs" role="tablist" aria-label="Open files"></div>
+          <div class="editor-wrap">
+            <div id="editor-host" tabindex="-1"></div>
+            <div class="welcome" id="welcome"></div>
+          </div>
+          <div class="sash sash-h" id="sash-panel" role="separator" aria-orientation="horizontal" aria-label="Resize problems panel" tabindex="0"></div>
+          <section class="panel" id="panel" aria-label="Problems and output">
+            <div class="panel-tabs" role="tablist">
+              <button class="panel-tab" role="tab" data-panel="problems" aria-selected="true">Problems <span class="count" id="problem-count">0</span></button>
+              <button class="panel-tab" role="tab" data-panel="output" aria-selected="false">Output</button>
+              <div class="panel-spacer"></div>
+              <button class="icon-btn" id="panel-close" aria-label="Close panel" title="Close panel (Ctrl+J)"></button>
+            </div>
+            <div class="panel-body" id="panel-problems" role="tabpanel"></div>
+            <pre class="panel-body output" id="panel-output" role="tabpanel" tabindex="0" hidden></pre>
+          </section>
+        </div>
+
+        <div class="sash sash-v" id="sash-pdf" role="separator" aria-orientation="vertical" aria-label="Resize PDF preview" tabindex="0"></div>
+
+        <section class="pdf-pane" id="pdf-pane" aria-label="PDF preview">
+          <div class="pdf-toolbar" role="toolbar" aria-label="PDF controls">
+            <div class="pdf-pager">
+              <input class="input page-input" id="pdf-page" inputmode="numeric" aria-label="Page number" value="0" />
+              <span class="page-count" id="pdf-pages">/ 0</span>
+            </div>
+            <div class="tool-group">
+              <button class="icon-btn" id="pdf-zoom-out" aria-label="Zoom out (Ctrl+-)" title="Zoom out (Ctrl+-)"></button>
+              <button class="zoom-label" id="pdf-zoom" aria-label="Zoom level" title="Zoom presets">100%</button>
+              <button class="icon-btn" id="pdf-zoom-in" aria-label="Zoom in (Ctrl+=)" title="Zoom in (Ctrl+=)"></button>
+            </div>
+            <div class="tool-group">
+              <button class="icon-btn" id="pdf-fit-width" aria-label="Fit width" title="Fit width" aria-pressed="false"></button>
+              <button class="icon-btn" id="pdf-fit-page" aria-label="Fit page" title="Fit page" aria-pressed="false"></button>
+              <button class="icon-btn" id="pdf-invert" aria-label="Dark pages" title="Dark pages" aria-pressed="false"></button>
+              <button class="icon-btn" id="pdf-sync" aria-label="Show cursor position in PDF (Ctrl+Alt+J)" title="Show cursor position in PDF (Ctrl+Alt+J)"></button>
+              <button class="icon-btn" id="pdf-external" aria-label="Open PDF in default viewer" title="Open in default viewer"></button>
+            </div>
+          </div>
+          <div class="compile-progress" aria-hidden="true"></div>
+          <div class="pdf-scroll" id="pdf-scroll" tabindex="0" aria-label="PDF pages. Double-click a line to jump to its source."></div>
+          <div class="pdf-empty" id="pdf-empty"></div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="statusbar" role="contentinfo">
+      <button class="status-item" id="st-compile" aria-live="polite"></button>
+      <button class="status-item" id="st-problems" title="Toggle problems panel (Ctrl+J)"></button>
+      <div class="status-spacer"></div>
+      <span class="status-item" id="st-cursor"></span>
+      <span class="status-item" id="st-words"></span>
+      <button class="status-item" id="st-main" title="Main file (what gets compiled)"></button>
+      <button class="status-item" id="st-engine" title="LaTeX engine"></button>
+    </footer>
+  </div>
+  <div id="toasts" role="status" aria-live="polite"></div>
+</body>
+</html>
