@@ -74,3 +74,7 @@ npm test               # parser unit tests
 npx tauri dev          # run with hot reload
 build.bat              # release exe + zip in build\
 ```
+
+## License
+
+MIT, see [LICENSE](LICENSE).
