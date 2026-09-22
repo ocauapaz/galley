@@ -9,13 +9,13 @@ for everything from themes to the LaTeX engine.
 *A galley proof is the long sheet of freshly set type that compositors pulled for proofreading
 before a page went to press — write, check the proof, correct, repeat.*
 
-**[Download the latest release](https://github.com/ocauapaz/galley/releases/latest)** — `Galley.exe`, no installer.
+**[Download the latest release](https://github.com/ocauapaz/galley/releases/latest)** — `Galley_<version>_x64-setup.exe`.
 
 ![Galley editing a document with the live PDF preview](docs/screenshot.png)
 
 ## Getting started
 
-1. Run `Galley.exe` (no installer; needs the WebView2 runtime that ships with Windows 11).
+1. Run the setup (per-user install, no admin needed; uses the WebView2 runtime that ships with Windows 11).
 2. **New project** → pick a template (Article, Report, Presentation, Letter, Blank), or **Open folder**.
 3. Press **Ctrl+Enter** to compile. The first compile downloads the Tectonic engine (~30 MB) and
    the LaTeX packages your document uses; after that, compiles take a second or two.
@@ -72,7 +72,7 @@ Requirements: Node 20+, Rust (MSVC toolchain), Visual Studio Build Tools.
 npm install
 npm test               # parser unit tests
 npx tauri dev          # run with hot reload
-build.bat              # release exe + zip in build\
+build.bat              # NSIS installer in build\
 ```
 
 ## License

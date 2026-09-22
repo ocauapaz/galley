@@ -8,7 +8,9 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::Mutex;
 use std::time::Instant;
-use tauri::Manager;
+use tauri::menu::{Menu, MenuItem};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+use tauri::{AppHandle, Emitter, Manager};
 
 const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 const MAX_TREE_ENTRIES: usize = 20_000;
@@ -321,10 +323,48 @@ fn run_compile(state: &CompileState, file: &str, engine: &str, custom: &str) -> 
     })
 }
 
+fn show_main(app: &AppHandle) {
+    if let Some(w) = app.get_webview_window("main") {
+        let _ = w.unminimize();
+        let _ = w.show();
+        let _ = w.set_focus();
+    }
+}
+
+fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
+    let show = MenuItem::with_id(app, "show", "Show Galley", true, None::<&str>)?;
+    let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+    let menu = Menu::with_items(app, &[&show, &quit])?;
+    let mut tray = TrayIconBuilder::with_id("main")
+        .tooltip("Galley")
+        .menu(&menu)
+        .show_menu_on_left_click(false)
+        .on_menu_event(|app, e| match e.id().as_ref() {
+            "show" => show_main(app),
+            // The frontend owns quitting so unsaved-changes prompts and session saving still run.
+            "quit" => {
+                show_main(app);
+                let _ = app.emit("tray-quit", ());
+            }
+            _ => {}
+        })
+        .on_tray_icon_event(|tray, e| {
+            if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = e {
+                show_main(tray.app_handle());
+            }
+        });
+    if let Some(icon) = app.default_window_icon() {
+        tray = tray.icon(icon.clone());
+    }
+    tray.build(app)?;
+    Ok(())
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .manage(CompileState(Mutex::new(None)))
+        .setup(|app| Ok(setup_tray(app.handle())?))
         .invoke_handler(tauri::generate_handler![
             load_settings,
             save_settings,

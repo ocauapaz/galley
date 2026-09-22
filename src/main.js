@@ -8,6 +8,7 @@ import './styles.css'
 
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { listen } from '@tauri-apps/api/event'
 import { open as openDialog } from '@tauri-apps/plugin-dialog'
 import { openSearchPanel } from '@codemirror/search'
 
@@ -604,6 +605,7 @@ function setupChrome() {
   win.onResized(syncMax)
   syncMax()
   win.onCloseRequested(e => { e.preventDefault(); requestClose() })
+  listen('tray-quit', requestClose)
   win.onFocusChanged(async ({ payload: focused }) => {
     if (!focused) { if (settings.autoSave === 'focus') saveAll(); return }
     if (!app.folder) return

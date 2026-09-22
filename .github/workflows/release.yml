@@ -27,15 +27,13 @@ jobs:
 
       - run: npm ci
       - run: npm test
-      - run: npx tauri build --no-bundle
+      - run: npx tauri build
 
       - name: Package
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force dist-release | Out-Null
-          Copy-Item src-tauri/target/release/galley.exe dist-release/Galley.exe
-          Copy-Item README.md dist-release/README.md
-          Compress-Archive -Force -Path dist-release/Galley.exe, dist-release/README.md -DestinationPath "dist-release/Galley-${{ github.ref_name }}-windows-x64.zip"
+          Copy-Item src-tauri/target/release/bundle/nsis/*-setup.exe dist-release/
 
       - uses: actions/upload-artifact@v4
         with:
@@ -45,6 +43,4 @@ jobs:
       - uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            dist-release/Galley.exe
-            dist-release/Galley-*.zip
+          files: dist-release/*-setup.exe
